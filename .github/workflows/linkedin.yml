@@ -1,0 +1,48 @@
+name: Posts no LinkedIn
+
+on:
+  schedule:
+    # Todo dia às 08:17 de Brasília (11:17 UTC)
+    - cron: "17 11 * * *"
+  workflow_dispatch:
+    inputs:
+      acao:
+        description: "O que executar"
+        type: choice
+        options: [tudo, gerar, publicar]
+        default: tudo
+      simular:
+        description: "Só simular (não grava nem publica)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: linkedin-posts
+  cancel-in-progress: false
+
+jobs:
+  executar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Gerar rascunhos e publicar aprovados
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          PLANILHA_ID: ${{ secrets.PLANILHA_ID }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+          PLANILHA_ABA: ${{ vars.PLANILHA_ABA }}
+          DIAS_ANTECEDENCIA: ${{ vars.DIAS_ANTECEDENCIA }}
+          MAX_POSTS_POR_EXECUCAO: ${{ vars.MAX_POSTS_POR_EXECUCAO }}
+        run: |
+          ACAO="${{ inputs.acao || 'tudo' }}"
+          FLAG=""
+          if [ "${{ inputs.simular }}" = "true" ]; then FLAG="--simular"; fi
+          python src/main.py "$ACAO" $FLAG
