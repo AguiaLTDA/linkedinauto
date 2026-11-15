@@ -30,18 +30,16 @@ Todo dia às 08:17 (horário de Brasília), o GitHub Actions faz duas coisas:
 ### 3. App no LinkedIn
 1. Em https://www.linkedin.com/developers/apps, crie um app. Ele exige associar uma Página de empresa; pode ser uma página da instituição ou uma página sua.
 2. Na aba **Products**, adicione **Share on LinkedIn** e **Sign In with LinkedIn using OpenID Connect**.
-3. Na aba **Auth**, em *Authorized redirect URLs*, adicione `http://localhost:8765/callback`.
-4. Anote o **Client ID** e o **Client Secret**.
-5. No seu computador, rode:
-   ```bash
-   pip install requests
-   ```
-   ```bash
-   LINKEDIN_CLIENT_ID=seu_id LINKEDIN_CLIENT_SECRET=seu_secret python scripts/obter_token.py
-   ```
-   O navegador abre, você autoriza, e o script imprime `LINKEDIN_ACCESS_TOKEN` e `LINKEDIN_PERSON_URN`.
+3. Na aba **Auth**, em *Authorized redirect URLs*, adicione `https://www.linkedin.com/developers/tools/oauth/redirect`.
+4. Gere o token **pelo navegador, sem instalar nada**:
+   1. Abra https://www.linkedin.com/developers/tools/oauth e clique em **Create token** (gerador de token).
+   2. Escolha o seu app, marque os escopos `openid`, `profile` e `w_member_social` e clique em **Request access token**.
+   3. Autorize com a sua conta e copie o token gerado.
+5. Cadastre o token no secret `LINKEDIN_ACCESS_TOKEN`. O `LINKEDIN_PERSON_URN` é opcional: se não existir, a automação descobre o seu perfil pelo próprio token.
 
-> ⚠️ **O token do LinkedIn vale 60 dias.** Marque um lembrete para rodar o `obter_token.py` de novo e atualizar o secret. Quando o token vencer, a linha fica com status `erro` e uma explicação na coluna `observacao`.
+> Alternativa pelo terminal: cadastre também `http://localhost:8765/callback` no passo 3 e rode `python scripts/obter_token.py` (instruções no topo do arquivo).
+
+> ⚠️ **O token do LinkedIn vale 60 dias.** Marque um lembrete para gerar outro (passo 4) e atualizar o secret. Quando o token vencer, a linha fica com status `erro` e uma explicação na coluna `observacao`.
 
 ### 4. Chave da API do Claude
 Crie em https://platform.claude.com, em Settings → API Keys.
@@ -55,8 +53,8 @@ Crie em https://platform.claude.com, em Settings → API Keys.
 | `ANTHROPIC_API_KEY` | chave do Claude |
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | conteúdo inteiro do JSON baixado no passo 2 |
 | `PLANILHA_ID` | ID da planilha |
-| `LINKEDIN_ACCESS_TOKEN` | impresso pelo `obter_token.py` |
-| `LINKEDIN_PERSON_URN` | impresso pelo `obter_token.py` (`urn:li:person:...`) |
+| `LINKEDIN_ACCESS_TOKEN` | token gerado no passo 3 |
+| `LINKEDIN_PERSON_URN` | opcional (`urn:li:person:...`) |
 
 3. Opcional, em **Variables**: `PLANILHA_ABA` (nome da aba, se não for a primeira), `DIAS_ANTECEDENCIA` (padrão 3) e `MAX_POSTS_POR_EXECUCAO` (padrão 1).
 

@@ -67,3 +67,16 @@ def test_simular_nao_altera_planilha():
     antes = aba.get_all_values()
     main.publicar(Planilha(aba), True, lambda t: (_ for _ in ()).throw(AssertionError("não deveria publicar")))
     assert aba.get_all_values() == antes
+
+
+def test_descobrir_urn(monkeypatch):
+    import linkedin
+
+    class Resp:
+        status_code = 200
+
+        def json(self):
+            return {"sub": "abc123", "name": "Felipe"}
+
+    monkeypatch.setattr(linkedin.requests, "get", lambda *a, **k: Resp())
+    assert linkedin.descobrir_urn("tok") == "urn:li:person:abc123"

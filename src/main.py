@@ -119,14 +119,22 @@ def main() -> int:
         gerar(planilha, args.simular, gerar_post)
 
     if args.acao in ("publicar", "tudo"):
+        from linkedin import descobrir_urn
         from linkedin import publicar as publicar_linkedin
 
-        token = os.environ.get("LINKEDIN_ACCESS_TOKEN", "")
-        autor = os.environ.get("LINKEDIN_PERSON_URN", "")
-        if not args.simular and not (token and autor):
-            print("Faltam LINKEDIN_ACCESS_TOKEN e/ou LINKEDIN_PERSON_URN.", file=sys.stderr)
+        token = os.environ.get("LINKEDIN_ACCESS_TOKEN", "").strip()
+        autor = os.environ.get("LINKEDIN_PERSON_URN", "").strip()
+        if not args.simular and not token:
+            print("Falta o secret LINKEDIN_ACCESS_TOKEN.", file=sys.stderr)
             return 1
-        publicar(planilha, args.simular, lambda texto: publicar_linkedin(texto, token, autor))
+
+        def publicar_post(texto: str) -> str:
+            nonlocal autor
+            if not autor:  # opcional: se não foi informado, descobre pelo próprio token
+                autor = descobrir_urn(token)
+            return publicar_linkedin(texto, token, autor)
+
+        publicar(planilha, args.simular, publicar_post)
     return 0
 
 

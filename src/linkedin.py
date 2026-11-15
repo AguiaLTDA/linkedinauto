@@ -50,6 +50,22 @@ def formatar_texto(texto: str) -> str:
     return "".join(partes)
 
 
+def descobrir_urn(token: str) -> str:
+    """Descobre o URN do perfil dono do token (exige os escopos openid e profile)."""
+    resp = requests.get(
+        "https://api.linkedin.com/v2/userinfo",
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=30,
+    )
+    if resp.status_code == 401:
+        raise RuntimeError(
+            "Token do LinkedIn inválido ou expirado, ou gerado sem os escopos openid e profile."
+        )
+    if resp.status_code != 200:
+        raise RuntimeError(f"LinkedIn respondeu {resp.status_code} ao buscar o perfil: {resp.text[:300]}")
+    return f"urn:li:person:{resp.json()['sub']}"
+
+
 def publicar(texto: str, token: str, autor_urn: str) -> str:
     """Publica o texto e devolve o link do post."""
     resp = requests.post(
