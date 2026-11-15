@@ -53,7 +53,7 @@ Crie em https://platform.claude.com, em Settings → API Keys.
 | `ANTHROPIC_API_KEY` | chave do Claude |
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | conteúdo inteiro do JSON baixado no passo 2 |
 | `PLANILHA_ID` | ID da planilha |
-| `LINKEDIN_ACCESS_TOKEN` | token gerado no passo 3 |
+| `LINKEDIN_ACCESS_TOKEN` | token gerado na etapa 3 (App no LinkedIn), passo 4 |
 | `LINKEDIN_PERSON_URN` | opcional (`urn:li:person:...`) |
 
 3. Opcional, em **Variables**: `PLANILHA_ABA` (nome da aba, se não for a primeira), `DIAS_ANTECEDENCIA` (padrão 3) e `MAX_POSTS_POR_EXECUCAO` (padrão 1).
